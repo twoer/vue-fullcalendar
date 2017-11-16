@@ -5,6 +5,7 @@
   	</p>
     <full-calendar class="test-fc" :events="fcEvents" 
       first-day='1' locale="fr"
+      :currentDate="currentDate"
       @changeMonth="changeMonth"
       @eventClick="eventClick"
       @dayClick="dayClick"
@@ -70,20 +71,25 @@ export default {
 	data () {
 		return {
             name:'Sunny!',
-            fcEvents : demoEvents
+            fcEvents : demoEvents,
+            currentDate: new Date('2017/2/1')
         }
 	},
   methods : {
     'changeMonth' (start, end, current) {
+      debugger;
       console.log('changeMonth', start.format(), end.format(), current.format())
     },
     'eventClick' (event, jsEvent, pos) {
+      debugger;
        console.log('eventClick', event, jsEvent, pos)
     },
     'dayClick' (day, jsEvent) {
+      debugger;
       console.log('dayClick', day, jsEvent)
     },
     'moreClick' (day, events, jsEvent) {
+      debugger;
       console.log('moreCLick', day, events, jsEvent)
     }
   },

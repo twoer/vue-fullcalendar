@@ -17,15 +17,16 @@
 </template>
 <script type="text/babel">
   import dateFunc from './dateFunc'
-  import moment from 'moment';
 
   export default {
+    created () {
+      this.dispatchEvent()
+    },
     props : {
-      currentMonth : {},
-      titleFormat  : {},
-      firstDay     : {},
-      monthNames   : {},
-      locale       : {}
+      currentDate : {},
+      titleFormat : {},
+      firstDay    : {},
+      monthNames  : {}
     },
     data () {
       return {
@@ -33,20 +34,45 @@
         rightArrow : '>'
       }
     },
-    computed: {
-      title () {
-        if (!this.currentMonth) return;
-        return this.currentMonth.locale(this.locale).format('MMMM YYYY')
+    computed:{
+      title(){
+        return dateFunc.format(this.currentDate, this.titleFormat, this.monthNames)
       }
     },
     methods : {
       goPrev () {
-        var newMonth = moment(this.currentMonth).subtract(1, 'months').startOf('month');
-        this.$emit('change', newMonth);
+        this.currentDate = this.changeMonth(this.currentDate, -1)
+        this.dispatchEvent()
       },
       goNext () {
-        var newMonth = moment(this.currentMonth).add(1, 'months').startOf('month');
-        this.$emit('change', newMonth);
+        this.currentDate = this.changeMonth(this.currentDate, 1)
+        this.dispatchEvent()
+      },
+      changeMonth (date, num) {
+        let dt = new Date(date)
+        return new Date(dt.setMonth(dt.getMonth() + num))
+      },
+      dispatchEvent() {
+        let startDate = dateFunc.getStartDate(this.currentDate)
+        let curWeekDay = startDate.getDay()
+
+        // 1st day of this monthView
+        let diff = parseInt(this.firstDay) - curWeekDay
+        if (diff) diff -= 7
+        startDate.setDate(startDate.getDate() + diff) 
+
+        // the month view is 6*7
+        let endDate = dateFunc.changeDay(startDate, 41)
+
+        // 1st day of current month
+        let currentDate = dateFunc.getStartDate(this.currentDate)
+
+        this.$emit('change', 
+          dateFunc.format(startDate, 'yyyy-MM-dd'),
+          dateFunc.format(endDate, 'yyyy-MM-dd'),
+          dateFunc.format(currentDate,'yyyy-MM-dd'),
+          this.currentDate
+        )
       }
     }
   }
